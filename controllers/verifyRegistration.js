@@ -24,8 +24,10 @@ const verifyRegistration = async (req, res, next) => {
 
   
     user.password = await bcrypt.hash(user.password, 10);
-    user.otp = { otp: null, sendTime: null, token: null }; 
 
+   
+    user.otp = { otp: null, sendTime: null, token: null }; 
+    console.log(otp)
     await user.save();
 
     res.status(200).json({ message: 'User registered successfully', status: true });
