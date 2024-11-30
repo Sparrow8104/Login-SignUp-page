@@ -1,39 +1,54 @@
 const User = require('../models/User');
+const bcrypt=require('bcrypt')
+const { getPendingUser, removePendingUser } = require('../utils/pendingUsers'); 
 
-const bcrypt = require('bcrypt');
 
-const verifyRegistration = async (req, res, next) => {
+const verifyOtp = async (req, res, next) => {
   const { email, otp, token } = req.body;
+  const formattedEmail = email.toLowerCase();
+  const pendingUser = getPendingUser(formattedEmail);
 
   try {
-    const formatedEmail = email.toLowerCase();
-
-    const user = await User.findOne({ email: formatedEmail });
-    if (!user) {
-      const error = new Error('No user found');
-      error.statusCode = 400;
-      throw error;
-    }
-
-    const { otp: storedOtp, sendTime, token: storedToken } = user.otp;
-    if (otp !== storedOtp || token !== storedToken || new Date().getTime() > sendTime) {
-      const error = new Error('Invalid or expired OTP');
-      error.statusCode = 400;
-      throw error;
-    }
-
   
-    user.password = await bcrypt.hash(user.password, 10);
+    if (!pendingUser) {
+      const error = new Error('No pending registration found for this email.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (Date.now() > pendingUser.otpExpirationTime) {
+      const error = new Error('OTP has expired. Please request a new one.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+ 
+    if (pendingUser.otp !== parseInt(otp, 10)) {
+      const error = new Error('Invalid OTP.');
+      error.statusCode = 400;
+      throw error;
+    }
+    const hashedPassword = await bcrypt.hash(pendingUser.password, 10);
+   
+    const newUser = new User({
+      name: pendingUser.name,
+      email: formattedEmail,
+      password:hashedPassword, 
+    });
+
+    await newUser.save();
 
    
-    user.otp = { otp: null, sendTime: null, token: null }; 
-    console.log(otp)
-    await user.save();
+    removePendingUser(formattedEmail);
 
-    res.status(200).json({ message: 'User registered successfully', status: true });
+    res.status(200).json({
+      message: 'Registration successful!',
+      status: true,
+    });
+
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = verifyRegistration;
+module.exports = verifyOtp;
