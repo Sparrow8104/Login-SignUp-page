@@ -29,6 +29,7 @@ const verifyOtp = async (req, res, next) => {
       throw error;
     }
     const hashedPassword = await bcrypt.hash(pendingUser.password, 10);
+console.log('Hashed password:', hashedPassword);
    
     const newUser = new User({
       name: pendingUser.name,
@@ -37,9 +38,13 @@ const verifyOtp = async (req, res, next) => {
     });
 
     await newUser.save();
+    console.log('user saved successfully')
 
    
+    console.log('Pending users before removal:', pendingUser);
     removePendingUser(formattedEmail);
+    console.log('Pending users after removal:', pendingUser);
+    
 
     res.status(200).json({
       message: 'Registration successful!',
