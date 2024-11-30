@@ -2,9 +2,9 @@ const User = require('../models/User');
 const crypto = require('crypto');
 const sendMail = require('../utils/sendMail');
 const joi = require('joi');
-const { addPendingUser, getPendingUser } = require('../utils/pendingUsers'); 
+const { addPendingUser, getPendingUser, removePendingUser } = require('../utils/pendingUsers'); 
 
-
+const OTP_COOLDOWN_TIME =60*1000;
 const register = async (req, res, next) => {
   const { error: validationError } = validateUser(req.body);
   const { name, email, password } = req.body;
@@ -27,11 +27,19 @@ const register = async (req, res, next) => {
       throw error;
     }
 
-  
-    if (getPendingUser(formattedEmail)) {
+   const pendingUser=getPendingUser(formattedEmail);
+
+    if (pendingUser) {
+      const currentTime=Date.now();
+      if(currentTime-pendingUser.sendTime<OTP_COOLDOWN_TIME){
+
       const error = new Error('OTP already sent. Please verify your email.');
       error.statusCode = 400;
       throw error;
+    }
+      else{
+        removePendingUser(formattedEmail);
+      }
     }
 
   
@@ -47,6 +55,7 @@ const register = async (req, res, next) => {
       otp,
       token,
       otpExpirationTime,
+      sendTime:Date.now(),
     });
 
     sendMail(otp, formattedEmail);
