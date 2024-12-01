@@ -1,8 +1,8 @@
-const User=require('../models/User')
+const Users=require('../models/Users')
 const crypto=require('crypto')
 const sendMail=require('../utils/sendMail')
 const forgetPassword=async(req,res,next) =>{
-   
+
 
     const {email}=req.body
 
@@ -10,7 +10,7 @@ const forgetPassword=async(req,res,next) =>{
 
         const formatedEmail=email.toLowerCase()
 
-        const finderUser=await User.findOne({email:formatedEmail})
+        const finderUser=await Users.findOne({email:formatedEmail})
         
         if(!finderUser){
             const error=new Error("no user found")
