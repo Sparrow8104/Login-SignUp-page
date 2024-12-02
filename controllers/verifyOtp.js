@@ -1,48 +1,50 @@
 const Users = require('../models/Users');
-const jwt = require('jsonwebtoken');
+const crypto = require('crypto'); 
 
 const verifyOtp = async (req, res, next) => {
-  const { email, otp } = req.body;  
+  const { email, otp, token } = req.body;
+  const formattedEmail = email.toLowerCase();
 
   try {
-    const formattedEmail = email.toLowerCase();
     const user = await Users.findOne({ email: formattedEmail });
 
     if (!user) {
-      const error = new Error("User not found");
-      error.statusCode = 400;
-      throw error;
+      return next(createError("User not found", 400));
+    }
+
+    if (user.otp.otp !== otp || user.otp.token !== token) {
+      return next(createError("Invalid OTP or token", 400));
+    }
+
+    if (new Date().getTime() > user.otp.expiryTime) {
+      return next(createError("OTP has expired. Please request a new one.", 400));
     }
 
     
-    if (user.otp.otp !== otp) {
-      const error = new Error("Invalid OTP");
-      error.statusCode = 400;
-      throw error;
-    }
-
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    
    
-    if (Date.now() > user.otp.expiryTime) {
-      const error = new Error("OTP has expired");
-      error.statusCode = 400;
-      throw error;
-    }
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = new Date().getTime() + 30 * 60 * 1000; // 30 minutes expiry
 
-   
-    const resetToken = jwt.sign(
-      { email: formattedEmail },  
-      process.env.JWT_SECRET,    
-      { expiresIn: '1h' }          
-    );
+    await user.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "OTP verified successfully",
-      resetToken,  
+      resetToken, 
       status: true
     });
+
   } catch (error) {
-    next(error);
+    return next(error);
   }
+};
+
+
+const createError = (message, statusCode) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
 };
 
 module.exports = verifyOtp;

@@ -8,6 +8,7 @@ const userSchema=new mongoose.Schema({
         otp:{type:String},
         sendTime:{type:Number},
         expiryTime: { type: Number },
+        token:{type:String}
     }
 },{timestamps:true});
 
