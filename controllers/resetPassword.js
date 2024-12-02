@@ -12,7 +12,7 @@ const resetPassword = async (req, res, next) => {
             decodedToken=jwt.verify(resetToken, process.env.JWT_SECRET);
             console.log('Decoded Payload:', decodedToken);
         }catch (err) {
-            console.error('Error during token verification:', err);  // Log the actual error during token verification
+            console.error('Error during token verification:', err);  
             if (err.name === "TokenExpiredError") {
                 const error = new Error("Token has expired. Please request a new one.");
                 error.statusCode = 400;
