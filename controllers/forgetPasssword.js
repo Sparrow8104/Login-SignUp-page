@@ -7,7 +7,7 @@ const forgetPassword=async(req,res,next) =>{
     const {email}=req.body
 
     try {
-
+        
         const formatedEmail=email.toLowerCase()
 
         const finderUser=await Users.findOne({email:formatedEmail})
@@ -18,7 +18,7 @@ const forgetPassword=async(req,res,next) =>{
             throw error
         }
 
-        if(finderUser.otp.otp &&new Date(finderUser.otp.sendTime).getTime()>new Date().getTime()){
+        if(finderUser.otp.otp && new Date().getTime() < finderUser.otp.expiryTime) {
             const error=new Error(
                 `please wait until ${new Date(
                     finderUser.otp.sendTime
@@ -34,8 +34,11 @@ const forgetPassword=async(req,res,next) =>{
 
         const token=crypto.randomBytes(32).toString('hex')
 
+        const otpExpiryTime = new Date().getTime() + 5 * 60 * 1000;
+
          finderUser.otp.otp=otp
          finderUser.otp.sendTime=new Date().getTime()
+         finderUser.otp.expiryTime=otpExpiryTime
          finderUser.otp.token=token
 
         await finderUser.save()
