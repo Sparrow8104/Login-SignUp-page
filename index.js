@@ -24,3 +24,5 @@ app.use((error,req,res,next) =>{
 
 getConnection();
 app.listen(process.env.PORT,() => console.log('server is running on port :'+process.env.PORT))
+
+
