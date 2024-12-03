@@ -6,6 +6,7 @@ const verifyRegistration = require('../controllers/verifyRegistration')
 const verifyOtp=require('../controllers/verifyOtp.js')
 const resetPassword=require('../controllers/resetPassword')
 const setUserName=require('../controllers/userName')
+const submitSurvey = require('../controllers/surveyControllers')
 
 const router=express.Router()
 
@@ -16,6 +17,8 @@ router.post('/forget/password',forgetPassword)
 router.post('/otp/verify',verifyOtp)
 router.post('/reset/password',resetPassword)
 router.post('/set/username',setUserName)
+router.post('/submit-survey', submitSurvey);
+
 
 
 module.exports=router
