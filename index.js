@@ -12,6 +12,10 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true,limit:"50mb"}))
 
 
+app.get('/', (req, res) => {
+     res.status(200).send('Server up and running')
+ })
+
 app.use('/user',userRoutes)
 
 app.use((error,req,res,next) =>{
