@@ -1,4 +1,4 @@
-const Username=require('../models/Username')
+const Username=require('../models/UserName')
 
 const setUserName=async (req,res)=>{
 const { username}=req.body
