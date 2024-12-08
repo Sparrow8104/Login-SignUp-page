@@ -4,7 +4,7 @@ const { getPendingUser, removePendingUser } = require('../utils/pendingUsers');
 
 
 const verifyOtp = async (req, res, next) => {
-  const { email, otp, token } = req.body;
+  const { email, otp,token} = req.body;
   const formattedEmail = email.toLowerCase();
   const pendingUser = getPendingUser(formattedEmail);
 

@@ -7,6 +7,7 @@ const verifyOtp=require('../controllers/verifyOtp.js')
 const resetPassword=require('../controllers/resetPassword')
 const setUserName=require('../controllers/userName')
 const submitSurvey = require('../controllers/surveyControllers')
+const getRecommendations = require('../controllers/recommendations')
 
 const router=express.Router()
 
@@ -18,6 +19,7 @@ router.post('/otp/verify',verifyOtp)
 router.post('/reset/password',resetPassword)
 router.post('/set/username',setUserName)
 router.post('/submit-survey', submitSurvey);
+router.post('/recommendations', getRecommendations);
 
 
 
