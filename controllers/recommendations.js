@@ -1,39 +1,39 @@
-const User = require('../models/User');
-const Exercise = require('../models/Exercise');
+const User = require('../models/User')
+const Exercise = require('../models/Exercise')
 
 const allocateRecommendations = (stats, totalItems) => {
-    const weights = {};
-    const maxScore = 5;
-    let totalWeight = 0;
+    const weights = {}
+    const maxScore = 5
+    let totalWeight = 0
 
     for (const [category, score] of Object.entries(stats)) {
-        const weight = maxScore - parseFloat(score); 
-        weights[category] = weight;
-        totalWeight += weight;
+        const weight = maxScore - parseFloat(score)
+        weights[category] = weight
+        totalWeight += weight
     }
 
-    const allocation = {};
+    const allocation = {}
     Object.entries(weights).forEach(([category, weight]) => {
-        allocation[category] = Math.round((weight / totalWeight) * totalItems);
-    });
-
-    return allocation;
-};
+        allocation[category] = Math.round((weight / totalWeight) * totalItems)
+    })
+   
+    return allocation
+}
 
 const getRecommendations = async (req, res) => {
     try {
-        const { stats } = req.body;
+        const { stats } = req.body
 
         if (!stats) {
-            return res.status(400).json({ error: 'Stats are required to generate recommendations' });
+            return res.status(400).json({ error: 'Stats are required to generate recommendations' })
         }
 
       
-        const exerciseAllocation = allocateRecommendations(stats, 10); 
-        const musicAllocation = allocateRecommendations(stats, 10);   
+        const exerciseAllocation = allocateRecommendations(stats, 10)
+        const musicAllocation = allocateRecommendations(stats, 10) 
 
-        const exercises = [];
-        const music = [];
+        const exercises = []
+        const music = []
 
        
         for (const [category, count] of Object.entries(exerciseAllocation)) {
@@ -41,7 +41,7 @@ const getRecommendations = async (req, res) => {
                 { $match: { category, type: 'exercise' } },
                 { $sample: { size: count } } 
             ]);
-            exercises.push(...ex);
+            exercises.push(...ex)
         }
 
         
@@ -50,7 +50,7 @@ const getRecommendations = async (req, res) => {
                 { $match: { category, type: 'music' } },
                 { $sample: { size: count } } 
             ]);
-            music.push(...mu);
+            music.push(...mu)
         }
 
         
@@ -59,8 +59,8 @@ const getRecommendations = async (req, res) => {
             recommendations: { exercises, music }
         });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to generate recommendations', details: error.message });
+        res.status(500).json({ error: 'Failed to generate recommendations', details: error.message })
     }
 };
 
-module.exports = getRecommendations;
+module.exports = getRecommendations
