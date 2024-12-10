@@ -1,6 +1,4 @@
 const nodemailer=require('nodemailer')
-const fs=require('fs')
-
 
 const sendMail = (otp,email)=>{
 
@@ -24,7 +22,7 @@ const sendMail = (otp,email)=>{
             <h1>OTP Verification</h1>
             <p>Your One-Time Password (OTP) is:</p>
             <div class="otp">${otp}</div>
-            <p>Please use this OTP to verify your account. This code is valid for 10 minutes.</p>
+            <p>Please use this OTP to verify your account. This code is valid for 5 minutes.</p>
             <div class="footer">
                 <p>If you didn't request this, please ignore this email.</p>
             </div>
