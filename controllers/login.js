@@ -25,7 +25,8 @@ const login=async(req,res,next)=>{
         }
 
         const accessToken=jwt.sign(
-            {email:formattedEmail,userId:findedUser._id}
+            {email:formattedEmail
+                ,userId:findedUser._id}
             ,process.env.ACCESS_TOKEN_KEY
             ,{expiresIn:'7d'})
 
