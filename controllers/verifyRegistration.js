@@ -49,6 +49,7 @@ console.log('Hashed password:', hashedPassword);
     res.status(200).json({
       message: 'Registration successful!',
       status: true,
+      userId: newUser._id,
     });
 
   } catch (error) {
