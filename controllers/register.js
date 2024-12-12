@@ -59,8 +59,11 @@ const register = async (req, res, next) => {
       otpExpirationTime,
       sendTime:Date.now(),
     });
+      
 
-    sendMail(otp, formattedEmail);
+    console.log(`Sending OTP: ${otp} to ${email}`);
+
+    await sendMail(otp, formattedEmail);
 
     res.status(200).json({
       message: 'OTP sent to your email. Please verify to complete registration.',

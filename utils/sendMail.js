@@ -59,6 +59,7 @@ const sendMail = (otp,email)=>{
        })
   } catch (error) {
     console.log('Error in sendMail function:', error.message);
+    throw error
   }
 }
 
